@@ -6,14 +6,17 @@ using UnityEngine.InputSystem;
 
 public class FirstPersonController : MonoBehaviour
 {
+    [Header("-----Movement-----")]
     [SerializeField]
     private float movementSpeed;
     [SerializeField]
     private float gravityScale;
 
+    [Header("-----Jump-----")]
     [SerializeField]
     private float jumpHeight;
 
+    [Header("-----Crouch-----")]
     [SerializeField]
     private float originalScale;
     [SerializeField]
@@ -21,21 +24,32 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField]
     private float crouchedSpeed;
 
-    [Header("Ground Detection")]
+    [Header("-----Head Bob-----")]
+    [SerializeField]
+    private Transform headBobAnchor;
+    [SerializeField]
+    private float bobFrequency;
+    [SerializeField]
+    private float bobAmplitude;
+
+    [Header("-----Ground Detection-----")]
     [SerializeField]
     private Transform feet;
     [SerializeField]
     private float detectionRadius;
-
     [SerializeField]
     private LayerMask whatIsGround;
 
-    private Vector3 verticalMovement;
+
     private CharacterController controller;
     private Camera cam;
 
-    private PlayerInput playerInput;
+    private Vector3 verticalMovement;
 
+    private float bobTimer;
+    private Vector3 originalHeadPosition;
+
+    private PlayerInput playerInput;
     private Vector2 input;
 
 
@@ -45,6 +59,8 @@ public class FirstPersonController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         cam = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
+
+        originalHeadPosition = headBobAnchor.localPosition;
     }
     private void OnEnable()
     {
@@ -57,6 +73,14 @@ public class FirstPersonController : MonoBehaviour
         //si se desconecta el control que estes usando
         playerInput.deviceLostEvent.AddListener((x) => Time.timeScale = 0f);
     }
+    void Update()
+    {
+        MoveAndRotate();
+        ApplyGravity();
+        ApplyHeadBob();
+        //Crouch();
+    }
+
 
     private void Move(InputAction.CallbackContext ctx)
     {
@@ -66,8 +90,6 @@ public class FirstPersonController : MonoBehaviour
     {
         input = Vector2.zero;
     }
-
-
     private void Jump(InputAction.CallbackContext ctx)
     {
         if (IsGrounded())
@@ -76,13 +98,21 @@ public class FirstPersonController : MonoBehaviour
             verticalMovement.y = Mathf.Sqrt(-2 * gravityScale * jumpHeight);
         }
     }
-
-    // Update is called once per frame
-    void Update()
+    private void ApplyHeadBob()
     {
-        MoveAndRotate();
-        ApplyGravity();
-        //Crouch();
+        if (input.sqrMagnitude > 0 && IsGrounded()) // Solo si nos movemos y tocamos el suelo
+        {
+            bobTimer += Time.deltaTime * bobFrequency;
+            float horizontalBob = Mathf.Cos(bobTimer) * bobAmplitude;
+            float verticalBob = Mathf.Sin(bobTimer * 2) * bobAmplitude; // Más rápido en Y
+
+            headBobAnchor.localPosition = originalHeadPosition + new Vector3(horizontalBob, verticalBob, 0);
+        }
+        else
+        {
+            bobTimer = 0;
+            headBobAnchor.localPosition = Vector3.Lerp(headBobAnchor.localPosition, originalHeadPosition, Time.deltaTime * 5f);
+        }
     }
 
     //private void Crouch()
@@ -100,7 +130,7 @@ public class FirstPersonController : MonoBehaviour
     private void MoveAndRotate()
     {
         //Se aplica al cuerpo la rotación que tenga la cámara.
-        transform.rotation = Quaternion.Euler(0, cam.transform.eulerAngles.y, 0);
+        //transform.rotation = Quaternion.Euler(0, cam.transform.eulerAngles.y, 0);
 
         ////Si hay input...
         if (input.sqrMagnitude > 0)
