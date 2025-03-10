@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -40,6 +41,11 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField]
     private LayerMask whatIsGround;
 
+    [Header("-----Message App-----")]
+    [SerializeField] private EventManagerSO eventManager;
+    [SerializeField] private MessageDataSO messageData;
+    [SerializeField] private GameObject messagePanel;
+    [SerializeField] private TMP_Text messageListText;
 
     private CharacterController controller;
     private Camera cam;
@@ -67,12 +73,20 @@ public class FirstPersonController : MonoBehaviour
         playerInput.actions["Jump"].started += Jump;
         playerInput.actions["Move"].performed += Move;
         playerInput.actions["Move"].canceled += MoveCancelled;
+        playerInput.actions["Message"].started += ToggleMessagePanel;
         /*deshabilitar los controles del gameplay y activar los controles de la UI.
         playerInput.SwitchCurrentActionMap("UI");*/
 
         //si se desconecta el control que estes usando
         playerInput.deviceLostEvent.AddListener((x) => Time.timeScale = 0f);
+
+        eventManager.OnMessageUpdated += UpdateMessageList;
     }
+    private void OnDisable()
+    {
+        eventManager.OnMessageUpdated -= UpdateMessageList;
+    }
+
     void Update()
     {
         MoveAndRotate();
@@ -126,6 +140,25 @@ public class FirstPersonController : MonoBehaviour
     //        transform.localScale *= 2;
     //    }
     //}
+    private void ToggleMessagePanel(InputAction.CallbackContext ctx)
+    {
+        messagePanel.SetActive(!messagePanel.activeSelf);
+        if (messagePanel.activeSelf)
+        {
+            UpdateMessageList();
+        }
+    }
+    private void UpdateMessageList()
+    {
+        messageListText.text = "";
+        foreach(var msg in messageData.messages)
+        {
+            if (msg.isTriggered)
+            {
+                messageListText.text += $"<b>{msg.title}</b>\n{msg.content}\n\n";
+            }
+        }
+    }
 
     private void MoveAndRotate()
     {

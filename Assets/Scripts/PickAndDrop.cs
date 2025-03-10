@@ -39,8 +39,7 @@ public class PickAndDrop : MonoBehaviour
     }
     private void TryPickObject()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, cam.transform.forward, out hit, pickUpDistance)) 
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, pickUpDistance)) 
         {
             Iinteractable interactable = hit.collider.GetComponent<Iinteractable>();
             if (interactable != null)

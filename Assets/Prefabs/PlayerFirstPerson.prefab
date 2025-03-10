@@ -337,7 +337,7 @@ GameObject:
   - component: {fileID: 5411980003564128369}
   m_Layer: 3
   m_Name: PlayerFirstPerson
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -510,7 +510,7 @@ GameObject:
   - component: {fileID: 4564150165442802730}
   m_Layer: 3
   m_Name: PlayerBody
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -560,6 +560,10 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
+  eventManager: {fileID: 0}
+  messageData: {fileID: 0}
+  messagePanel: {fileID: 0}
+  messageListText: {fileID: 0}
 --- !u!114 &7771621289775366226
 MonoBehaviour:
   m_ObjectHideFlags: 0
