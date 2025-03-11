@@ -11,6 +11,8 @@ public class PickAndDrop : MonoBehaviour
     private float pickUpDistance;
     [SerializeField] 
     private float throwForce;
+    [SerializeField]
+    private EventManagerSO eventManager;
 
     private PickableObject pickUpObject;
 
