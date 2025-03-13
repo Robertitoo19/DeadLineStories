@@ -10,6 +10,7 @@ public class EventManagerSO : ScriptableObject
     public event Action OnNoInteractuable;
 
     public event Action<string, string> OnNotificationReceived;
+    public event Action<SubtitleDataSO.SubtitleEntry> OnSubtitleTriggered;
     public event Action OnMessageUpdated;
 
     public void NewInteractuable()
@@ -24,5 +25,9 @@ public class EventManagerSO : ScriptableObject
     {
         OnNotificationReceived?.Invoke(title, content);
         OnMessageUpdated?.Invoke();
+    }
+    public void TriggerSubtitle(SubtitleDataSO.SubtitleEntry subtitleData)
+    {
+        OnSubtitleTriggered?.Invoke(subtitleData);
     }
 }
